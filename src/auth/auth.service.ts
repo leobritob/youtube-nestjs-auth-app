@@ -19,17 +19,15 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string) {
-    let user: UsersEntity;
+  async validateUser(email: string, password: string): Promise<UsersEntity> {
     try {
-      user = await this.userService.findOneOrFail({ email });
+      const user = await this.userService.findOneOrFail({ email });
+      const isPasswordValid = compareSync(password, user.password);
+      if (!isPasswordValid) return null;
+
+      return user;
     } catch (error) {
       return null;
     }
-
-    const isPasswordValid = compareSync(password, user.password);
-    if (!isPasswordValid) return null;
-
-    return user;
   }
 }
